@@ -11,6 +11,21 @@
           update_cache: yes
         register: yum_upgrade
 
+      - name: Install kernel recompilation toolchain  # Required for VMware
+        yum:
+          name: "{{ item }}"
+          state: latest
+        with_items:
+          - gcc
+          - kernel-devel
+        when: external_interface == 'ens33'
+
+      - name: Enable auto-recompilation of VMware modules
+        lineinfile:
+          path: /etc/vmware-tools/locations
+          line: 'answer AUTO_KMODS_ENABLED yes'
+        when: external_interface == 'ens33'
+
       - name: Update networking before reboot
         meta: flush_handlers
 
@@ -62,7 +77,7 @@
 
       - name: Run Packstack Installer - Please Wait
         command: "{{ packstack_common_command + packstack_guest_specific_args }}"
-        async: 1200 # Possible this needs to be larger
+        async: 1200   # Possible this needs to be larger
         poll: 10
 
       - name: Reboot host
