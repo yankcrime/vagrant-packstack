@@ -18,6 +18,8 @@
         with_items:
           - gcc
           - kernel-devel
+          - vim
+          - python-virtualenv
         when: external_interface == 'ens33'
 
       - name: Enable auto-recompilation of VMware modules
